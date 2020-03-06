@@ -5,11 +5,17 @@ jdk: openjdk8
 service:
   docker
 
+env:
+ global:
+   - COMMIT=${TRAVIS_COMMIT::7}
+
 script:
   - ./mvnw clean install -B
 
 
 after_success:
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
+  - export IMAGE_NAME=alexjkd/cicd-demo
   - docker build -t $IMAGE_NAME:$COMMIT .
   - docker tag $IMAGE_NAME:$COMMIT $IMAGE_NAME:$TAG
 
